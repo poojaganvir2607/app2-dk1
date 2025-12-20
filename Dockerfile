@@ -1,4 +1,4 @@
 FROM nginx:mainline-alpine3.23
-WORKDIR /app
-COPY index.html /app/index.html
+RUN rm -rf /usr/share/nginx/html/*
+COPY *.html /usr/share/nginx/html/
 EXPOSE 80

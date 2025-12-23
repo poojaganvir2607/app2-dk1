@@ -1,0 +1,81 @@
+pipeline {
+    agent any 
+    environment {
+        IMAGE_NAME = "myapp"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        CONTAINER_NAME = "my-container"
+        //DOCKERHUB_USER = "poojaganvir2607"
+        ECR_URI = "public.ecr.aws/m8b8m3k4/myapp"
+        PATH = "/usr/local/bin:${env.PATH}"
+        AWS_REGION = "us-east-1"
+    }
+    stages {
+        stage("checkout code") {
+            steps {
+                git branch: 'feature-ecr', url: 'https://github.com/poojaganvir2607/app2-dk1.git'
+            }
+        }
+        stage("build docker image") {
+            steps {
+                sh "docker build --no-cache -t ${ECR_URI}:${IMAGE_TAG} ."
+            }
+        }
+        stage("login to public ecr repo") {
+            steps {
+                // Use AWS credentials to login to public ECR non-interactively
+                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credd']]) {
+                    sh '''
+                        aws ecr-public get-login-password --region $AWS_REGION | \
+                        docker login --username AWS --password-stdin public.ecr.aws/m8b8m3k4
+                    '''
+                }
+                
+            }
+        }
+        /*
+        stage("docker hub login") {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: "docker-hub-cred-pooja",
+                    usernameVariable: "DOCKER_USER",
+                    passwordVariable: "DOCKER_PASS"
+                )]) {
+                    sh '''
+                      echo \$DOCKER_PASS | docker login \
+                      -u \$DOCKER_USER --password-stdin 
+                    '''
+                    }
+            }
+        }
+        */
+        stage("stop docker container") {
+            steps {
+                sh "docker rm -f ${CONTAINER_NAME} || true"
+            }
+        }
+        stage("push image to dockerhub") {
+            steps {
+                sh "docker push ${ ECR_URI}:${IMAGE_TAG}"
+            }
+        }
+        /*
+        stage("build docker container") {
+            steps {
+                sh """
+                  docker run -d \
+                  --name ${CONTAINER_NAME} \
+                  -p 8082:80 \
+                  ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+                  """
+            }
+        }
+        */
+        stage("pod and service deployment") {
+            steps {
+                sh "sed -i '' 's|BUILD_NUMBER|${IMAGE_TAG}|g' Deployment.yaml"
+                sh "kubectl -n dev apply -f Deployment.yaml"
+                sh "kubectl -n dev apply -f service.yaml"
+            }
+        }
+    }
+}

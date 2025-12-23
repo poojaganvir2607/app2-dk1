@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: nginx
-        image: poojaganvir2607/myapp:BUILD_NUMBER
+        image: public.ecr.aws/m8b8m3k4/myapp:BUILD_NUMBER
         imagePullPolicy: Always
         ports:
         - containerPort: 80

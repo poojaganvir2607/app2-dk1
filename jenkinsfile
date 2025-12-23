@@ -5,14 +5,14 @@ pipeline {
         IMAGE_TAG = "${BUILD_NUMBER}"
         CONTAINER_NAME = "my-container"
         //DOCKERHUB_USER = "poojaganvir2607"
-        ECR_URI = "public.ecr.aws/m8b8m3k4/myapp"
+        ECR_URI = "747409585857.dkr.ecr.us-east-1.amazonaws.com/myapp"
         PATH = "/usr/local/bin:${env.PATH}"
         AWS_REGION = "us-east-1"
     }
     stages {
         stage("checkout code") {
             steps {
-                git branch: 'feature-ecr', url: 'https://github.com/poojaganvir2607/app2-dk1.git'
+                git branch: 'feature-ecr-private', url: 'https://github.com/poojaganvir2607/app2-dk1.git'
             }
         }
         stage("build docker image") {
@@ -20,13 +20,13 @@ pipeline {
                 sh "docker build --no-cache -t ${ECR_URI}:${IMAGE_TAG} ."
             }
         }
-        stage("login to public ecr repo") {
+        stage("login to private ecr repo") {
             steps {
                 // Use AWS credentials to login to public ECR non-interactively
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credd']]) {
                     sh '''
-                        aws ecr-public get-login-password --region $AWS_REGION | \
-                        docker login --username AWS --password-stdin public.ecr.aws/m8b8m3k4
+                        aws ecr get-login-password --region $AWS_REGION | \
+                        docker login --username AWS --password-stdin 747409585857.dkr.ecr.us-east-1.amazonaws.com
                     '''
                 }
                 

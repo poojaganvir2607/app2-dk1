@@ -9,4 +9,8 @@ service:
   type: NodePort
   port: 80
   nodePort: 30080
+# Add this to fix the nil pointer error
+serviceAccount:
+  create: false
+  name: myapp-serviceaccount
 

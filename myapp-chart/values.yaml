@@ -13,4 +13,5 @@ service:
 serviceAccount:
   create: false
   name: myapp-serviceaccount
-
+ingress:
+  enabled: false   # just disable it

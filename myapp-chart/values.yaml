@@ -17,3 +17,6 @@ ingress:
   enabled: false   # just disable it
 httpRoute:
   enabled: false
+autoscaling:
+  enabled: false
+

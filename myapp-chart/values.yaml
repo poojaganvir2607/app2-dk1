@@ -1,0 +1,12 @@
+replicaCount: 2
+
+image:
+  repository: poojaganvir2607/myapp
+  tag: ""        # Jenkins will set this dynamically
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 80
+  nodePort: 30080
+

@@ -22,3 +22,12 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+          volumeMounts:
+            - name: tls-secret
+              mountPath: /etc/nginx/tls
+              readOnly: true
+
+      volumes:
+        - name: tls-secret
+          secret:
+            secretName: myapp-secret

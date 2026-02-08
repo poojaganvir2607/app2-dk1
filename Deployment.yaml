@@ -17,7 +17,7 @@ spec:
         image: poojaganvir2607/myapp:BUILD_NUMBER
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 443
         volumeMounts:
           - name: tls-volume
             mountPath: /etc/ssl/certs
